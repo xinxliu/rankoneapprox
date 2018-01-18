@@ -5,12 +5,10 @@ import load_cub
 import torchvision.transforms as transforms
 from collections import OrderedDict
 import numpy
-import matplotlib
 import matplotlib.pyplot as plt
 
 
-
-def test_mfcnn(model,testloader,criterion):
+def test_mfcnn(model, testloader, criterion):
     model.eval()
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -22,14 +20,15 @@ def test_mfcnn(model,testloader,criterion):
         target_var = Variable(target,volatile = True)
 
         output, _ = model(input_var)
-        loss = criterion(output,target_var)
+        loss = criterion(output, target_var)
 
-        prec1,prec5 = accuracy(output.data,target,topk=(1,5))
+        prec1, prec5 = accuracy(output.data,target,topk=(1,5))
         losses.update(loss.data[0],input.size(0))
         top1.update(prec1[0],input.size(0))
         top5.update(prec5[0],input.size(0))
 
-    print('Test: * Loss {loss.avg:.4f} Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(loss=losses,top1=top1,top5=top5))
+    print('Test: * Loss {loss.avg:.4f} Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'\
+          .format(loss=losses,top1=top1,top5=top5))
 
 def accuracy(output,target,topk=(1,)):
     maxk = max(topk)
@@ -40,9 +39,10 @@ def accuracy(output,target,topk=(1,)):
 
     res = []
     for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0,keepdim=True)
+        correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
         res.append(correct_k.mul_(100.0/batch_size))
     return res
+
 
 class AverageMeter(object):
     def __init__(self):
