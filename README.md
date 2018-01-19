@@ -6,6 +6,6 @@ rank one approximate bilinear cnn
 + rank-one approx: 74.6% on cub
 + other settings
 
-## Useage
+## Usage
 + create a cfg in file train_mfcnn.py then `eval` 
 + `python train_mfcnn.py |tee ...`

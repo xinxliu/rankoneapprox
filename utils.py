@@ -1,4 +1,4 @@
-import torch
+from torch.autograd import Variable
 import torchvision.transforms as transforms
 
 cub_mean = [0.486, 0.500, 0.433]
@@ -70,4 +70,47 @@ def test_model(model, testloader, criterion, topk = (1,)):
     :return acc(list, topk), average loss
 
     '''
-    pass
+    # necessary if there is bn
+    model.eval()
+    loss = 0
+    acc = [0 for i in range(len(topk))]
+    count = 0
+    for imgs, labels in testloader:
+        imgs = Variable(imgs.cuda(), volatile=True)
+        labels = Variable(labels.cuda(), volatile=True)
+
+        N = imgs.size(0)
+        count += N
+        output = model(imgs)
+        lossinepoch = criterion(output, labels)
+        loss += lossinepoch * N
+
+        res = accuracy(output, labels, topk)
+        res = [i*N for i in res]
+        assert len(res) == len(acc)
+        acc = [i+j for i, j in zip(acc, res)]
+
+    loss = loss / count
+    acc = [i / count for i in acc]
+    return acc, loss
+
+
+def accuracy(output,target,topk=(1,)):
+    '''
+    calculate average topk acc for classification tasks
+    :param output: score vector
+    :param target: labels
+    :param topk: tuple ,its elements should be `int`
+    :return: acc, its length is equal to tuple topk
+    '''
+    maxk = max(topk)
+    batch_size = target.size(0)
+    _,pred = output.topk(maxk, 1, True, True)
+    pred = pred.t()
+    correct = pred.eq(target.view(1,-1).expand_as(pred))
+
+    res = []
+    for k in topk:
+        correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
+        res.append(correct_k.mul_(100.0/batch_size))
+    return res
