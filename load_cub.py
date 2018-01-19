@@ -55,7 +55,6 @@ class CUB200(data.Dataset):
 
         self.imgs, self.classes, self.class_to_idx = build_set(self.root, self.train)
 
-
     def __getitem__(self, index):
 
         path, target = self.imgs[index]
@@ -69,11 +68,9 @@ class CUB200(data.Dataset):
 
         return img, target
 
-
     def _check_exists(self):
         pth = self.root
         return os.path.exists(os.path.join(pth, 'CUB_200_2011/'))
-
 
     def __len__(self):
         return len(self.imgs)
